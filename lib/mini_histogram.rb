@@ -4,30 +4,57 @@ require 'math'
 module MiniHistogram
   class Error < StandardError; end
 
-  include Math # log2, log10
+  extend Math # log2, log10
 
-  def pow(power, value)
-    value ** power
+  def self.sturges(ary)
+    len = ary.length
+    return 1.0 if len == 0
+
+    # return (long)(ceil(log2(n)) + 1);
+    return log2(len).ceil + 1
   end
 
-  def edges_lo_hi(lo, hi, nbins, left_p)
-    if high == lo
+  def self.edges(array, left_p: false)
+    hi = array.max
+    lo = array.min
+
+    nbins = sturges(array) * 1.0
+
+    if hi == lo
       start = hi
-      step = 1
-      divisor = 1
-      len = 1
+      step = 1.0
+      divisor = 1.0
+      len = 1.0
     else
-      bw = (hi - low) / nbins
+      bw = (hi - lo) / nbins
       lbw = log10(bw)
       if lbw >= 0
-        step = pow(10, lbw.floor)
-        r = bw/step;
-        if r < 1.1
+        step = 10 ** lbw.floor * 1.0
+        r = bw/step
+
+        if r <= 1.1
+          # do nothing
+        elsif r <= 2.2
+          step *= 2.0
+        elsif r <= 5.5
+          step *= 5.0
+        else
+          step *= 10
+        end
+        divisor = 1.0
+        start = step * (lo/step).floor
+        len = ((hi - start)/step).ceil
+      else
+        divisor = 10 ** - lbw.floor
+        r = bw * divisor
+        if r <= 1.1
           # do nothing
         elsif r <= 2.2
           divisor /= 2.0
         elsif r <= 5.5
           divisor /= 5.0
+        else
+          divisor /= 10.0
         end
         step = 1.0
         start = (lo * divisor).floor
@@ -52,7 +79,7 @@ module MiniHistogram
       end
 
       edge = []
-      len.times.each do
+      len.next.times.each do
         edge << start/divisor
         start += step
       end
