@@ -5,6 +5,14 @@ class MiniHistogramTest < Minitest::Test
     refute_nil ::MiniHistogram::VERSION
   end
 
+  def test_thing
+    a = [1,1,1, 5, 5, 5, 5, 10, 10, 10]
+    edges = [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0]
+    actual = MiniHistogram.counts_from_edges(a, edges: edges)
+    expected = [3, 0, 4, 0, 0, 3]
+    assert_equal expected, actual
+  end
+
   def test_it_does_something_useful
     a = [1,1,1, 5, 5, 5, 5, 10, 10, 10]
     actual = MiniHistogram.sturges(a)
