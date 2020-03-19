@@ -6,6 +6,12 @@ module MiniHistogram
 
   extend Math # log2, log10
 
+  # Weird name, right? There are multiple ways to
+  # calculate the number of "bins" a histogram should have, one
+  # of the most common is the "sturges" method
+  #
+  # Here are some alternatives from numpy:
+  # https://github.com/numpy/numpy/blob/d9b1e32cb8ef90d6b4a47853241db2a28146a57d/numpy/lib/histograms.py#L489-L521
   def self.sturges(ary)
     len = ary.length
     return 1.0 if len == 0
