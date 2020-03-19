@@ -13,11 +13,18 @@ task :default => :test
 
 
 task :bench do
-  array = 1000.times.map { rand }
-
   require 'benchmark/ips'
   require 'enumerable/statistics'
   require 'mini_histogram'
+
+  array = 1000.times.map { rand }
+
+  edges = MiniHistogram.edges(array)
+  my_weights = MiniHistogram.counts_from_edges(array, edges: edges)
+  puts array.histogram.weights == my_weights
+  puts array.histogram.weights.inspect
+  puts my_weights.inspect
+
 
   Benchmark.ips do |x|
     x.report("enumerable stats") { array.histogram }
