@@ -34,9 +34,11 @@ module MiniHistogram
   #   This means that the `a` array has 3 values between 0.0 and 2.0
   #   4 values between 4.0 and 6.0 and three values between 10.0 and 12.0
   def self.counts_from_edges(array, edges:, left_p: false)
-    bins = Array.new(edges.length - 2, 0)
     lo = edges.first
     step = edges[1] - edges[0]
+
+    max_index = ((array.max  - lo) / step).floor
+    bins = Array.new(max_index + 1, 0)
 
     array.each do |x|
       index = ((x - lo) / step).floor
