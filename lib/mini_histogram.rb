@@ -1,10 +1,16 @@
 require "mini_histogram/version"
 require 'math'
 
-module MiniHistogram
+class MiniHistogram
  class Error < StandardError; end
 
-  extend Math # log2, log10
+  include Math # log2, log10
+
+  attr_reader :array, :left_p
+  def initialize(array, left_p: false)
+    @array = array
+    @left_p = left_p
+  end
 
   # Weird name, right? There are multiple ways to
   # calculate the number of "bins" a histogram should have, one
@@ -12,8 +18,8 @@ module MiniHistogram
   #
   # Here are some alternatives from numpy:
   # https://github.com/numpy/numpy/blob/d9b1e32cb8ef90d6b4a47853241db2a28146a57d/numpy/lib/histograms.py#L489-L521
-  def self.sturges(ary)
-    len = ary.length
+  def sturges
+    len = array.length
     return 1.0 if len == 0
 
     # return (long)(ceil(log2(n)) + 1);
@@ -33,7 +39,7 @@ module MiniHistogram
   #
   #   This means that the `a` array has 3 values between 0.0 and 2.0
   #   4 values between 4.0 and 6.0 and three values between 10.0 and 12.0
-  def self.counts_from_edges(array, edges:, left_p: false)
+  def counts_from_edges(edges: )
     lo = edges.first
     step = edges[1] - edges[0]
 
@@ -62,11 +68,11 @@ module MiniHistogram
   #
   #  Another good set of implementations is in numpy
   #  https://github.com/numpy/numpy/blob/d9b1e32cb8ef90d6b4a47853241db2a28146a57d/numpy/lib/histograms.py#L222
-  def self.edges(array, left_p: false)
+  def edges
     hi = array.max
     lo = array.min
 
-    nbins = sturges(array) * 1.0
+    nbins = sturges * 1.0
 
     if hi == lo
       start = hi
