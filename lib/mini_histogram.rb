@@ -28,21 +28,16 @@ module MiniHistogram
   #   This means that the `a` array has 3 values between 0.0 and 2.0
   #   4 values between 4.0 and 6.0 and three values between 10.0 and 12.0
   def self.counts_from_edges(array, edges:, left_p: false)
-    bins = []
-    edges = edges.dup
-    last = edges.shift
-    while edges.any?
-      bins << BinaryBinTree.new(lo: last, hi: edges.first)
-      last = edges.shift
-    end
-
-    root = BinaryBinTree.sorted_array_to_bst(bins, 0, bins.length - 1)
+    bins = Array.new(edges.length - 1, 0)
+    lo = edges.first
+    step = edges[1] - edges[0]
 
     array.each do |x|
-      root.insert(x)
+      index = ((x - lo) / step).floor
+      bins[index] += 1
     end
 
-    return bins.map(&:count)
+    return bins
   end
 
   # Finds the "edges" of a given histogram that will mark the boundries
@@ -148,6 +143,22 @@ module MiniHistogram
   # we should have our index. I'm not totally sure if that would
   # work, but it should be faster than a search
   #
+  # Annnnnnnnnd it's way faster to not do the search
+  #
+  # Before:
+  #
+  #  enumerable stats:     9335.9 i/s
+  #  mini histogram  :     3669.4 i/s - 2.54x  slower
+  #
+  # After:
+  #
+  #   enumerable stats:     9375.9 i/s
+  #   mini histogram  :     7234.9 i/s - 1.30x  slower
+  #
+  # Thats 1.97x faster. Sure, still not as fast as a C extension
+  # but it's quite the improvement
+  #
+  # This class isn't used currently now
   class BinaryBinTree
     attr_accessor :lo, :hi, :child_lo, :child_hi, :count
 
