@@ -2,44 +2,7 @@ require "mini_histogram/version"
 require 'math'
 
 module MiniHistogram
-  class BinaryBinTree
-    attr_accessor :lo, :hi, :child_lo, :child_hi, :count
-
-    def initialize(lo:, hi:)
-      @lo = lo
-      @hi = hi
-      @child_lo = nil
-      @child_hi = nil
-      @count = 0
-    end
-
-    def to_s
-      [@lo, @hi].to_s
-    end
-
-    def insert(x)
-      if x < hi
-        if x >= lo
-          @count += 1
-        else
-          child_lo.insert(x)
-        end
-      else
-        child_hi.insert(x)
-      end
-    end
-
-    def self.sorted_array_to_bst(array, start_index, end_index)
-      return false if start_index > end_index
-      mid_index = ((start_index + end_index)/2.0).floor
-      root = array[mid_index]
-      root.child_hi = sorted_array_to_bst(array, mid_index + 1, end_index)
-      root.child_lo = sorted_array_to_bst(array, start_index, mid_index - 1)
-      return root
-    end
-  end
-  private_constant :BinaryBinTree
-  class Error < StandardError; end
+ class Error < StandardError; end
 
   extend Math # log2, log10
 
@@ -51,6 +14,19 @@ module MiniHistogram
     return log2(len).ceil + 1
   end
 
+  # Given an array of edges and an array we want to generate a histogram from
+  # return the counts for each "bin"
+  #
+  # Example:
+  #
+  #   a = [1,1,1, 5, 5, 5, 5, 10, 10, 10]
+  #   edges = [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0]
+  #
+  #   MiniHistogram.counts_from_edges(a, edges: edges)
+  #   # => [3, 0, 4, 0, 0, 3]
+  #
+  #   This means that the `a` array has 3 values between 0.0 and 2.0
+  #   4 values between 4.0 and 6.0 and three values between 10.0 and 12.0
   def self.counts_from_edges(array, edges:, left_p: false)
     bins = []
     edges = edges.dup
@@ -69,6 +45,20 @@ module MiniHistogram
     return bins.map(&:count)
   end
 
+  # Finds the "edges" of a given histogram that will mark the boundries
+  # for the histogram's "bins"
+  #
+  # Example:
+  #
+  #  a = [1,1,1, 5, 5, 5, 5, 10, 10, 10]
+  #  MiniHistogram.edges(a)
+  #  # => [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0]
+  #
+  #  There are multiple ways to find edges, this was taken from
+  #  https://github.com/mrkn/enumerable-statistics/issues/24
+  #
+  #  Another good set of implementations is in numpy
+  #  https://github.com/numpy/numpy/blob/d9b1e32cb8ef90d6b4a47853241db2a28146a57d/numpy/lib/histograms.py#L222
   def self.edges(array, left_p: false)
     hi = array.max
     lo = array.min
@@ -141,4 +131,70 @@ module MiniHistogram
       return edge
     end
   end
+
+  # Private class used to insert count values for a histogram
+  # each instance represents a node in a tree, each node
+  # represents a "bin" in a histogram. Essentially a high value
+  # and a low value. When we count elements in our histogram
+  # we count them per bin i.e. whether the number fits between
+  # the high and low values. Using a tree structure we can
+  # build a binary search to figure out which bin a given
+  # value would fall into, then once found we increment the count
+  #
+  # As i'm writing this out, i'm realizing we don't need to search
+  # since the step size is normalized, we know the value is between
+  # a high and low range and we know the range, we could instead
+  # subtract the low value, then divide by the range, floor it and
+  # we should have our index. I'm not totally sure if that would
+  # work, but it should be faster than a search
+  #
+  class BinaryBinTree
+    attr_accessor :lo, :hi, :child_lo, :child_hi, :count
+
+    def initialize(lo:, hi:)
+      @lo = lo
+      @hi = hi
+      @child_lo = nil
+      @child_hi = nil
+      @count = 0
+    end
+
+    def to_s
+      [@lo, @hi].to_s
+    end
+
+    # The meat and potatoes, increments count if
+    # the value is between it's high and low, otherwise
+    # it traverses down the tree to find a valid node
+    #
+    # node.hi # => 10
+    # node.lo # => 0
+    #
+    # node.count # => 41
+    # node.insert(5)
+    # node.count # => 42
+    def insert(x)
+      if x < hi
+        if x >= lo
+          @count += 1
+        else
+          child_lo.insert(x)
+        end
+      else
+        child_hi.insert(x)
+      end
+    end
+
+    # Builds a binary search tree from a sorted array
+    def self.sorted_array_to_bst(array, start_index, end_index)
+      return false if start_index > end_index
+      mid_index = ((start_index + end_index)/2.0).floor
+      root = array[mid_index]
+      root.child_hi = sorted_array_to_bst(array, mid_index + 1, end_index)
+      root.child_lo = sorted_array_to_bst(array, start_index, mid_index - 1)
+      return root
+    end
+  end
+  private_constant :BinaryBinTree
+
 end
