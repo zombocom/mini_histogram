@@ -1,15 +1,51 @@
 require "mini_histogram/version"
 require 'math'
 
+# A class for building histogram info
+#
+# Given an array, this class calculates the "edges" of a histogram
+# these edges mark the boundries for "bins"
+#
+#   array = [1,1,1, 5, 5, 5, 5, 10, 10, 10]
+#   histogram = MiniHistogram.new(array)
+#   puts histogram.edges
+#   # => [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0]
+#
+# It also finds the weights (aka count of values) that would go in each bin:
+#
+#   puts histogram.weights
+#   # => [3, 0, 4, 0, 0, 3]
+#
+# This means that the `array` here had three items between 0.0 and 2.0.
+#
 class MiniHistogram
- class Error < StandardError; end
-
-  include Math # log2, log10
-
+  class Error < StandardError; end
   attr_reader :array, :left_p
-  def initialize(array, left_p: false)
+
+  def initialize(array, left_p: false, edges: nil)
     @array = array
     @left_p = left_p
+    @edges = edges
+    @weights = nil
+  end
+
+  def edges_min
+    edges.min
+  end
+
+  def edges_max
+    edges.max
+  end
+
+  # Sets the edge value to something new,
+  # also clears any previously calculated values
+  def set_edges(value)
+    @edges = value
+    @weights = nil # clear memoized value
+  end
+
+  def bin_size
+    edges[1] - edges[0]
   end
 
   # Weird name, right? There are multiple ways to
@@ -22,8 +58,8 @@ class MiniHistogram
     len = array.length
     return 1.0 if len == 0
 
-    # return (long)(ceil(log2(n)) + 1);
-    return log2(len).ceil + 1
+    # return (long)(ceil(Math.log2(n)) + 1);
+    return Math.log2(len).ceil + 1
   end
 
   # Given an array of edges and an array we want to generate a histogram from
@@ -34,24 +70,26 @@ class MiniHistogram
   #   a = [1,1,1, 5, 5, 5, 5, 10, 10, 10]
   #   edges = [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0]
   #
-  #   MiniHistogram.counts_from_edges(a, edges: edges)
+  #   MiniHistogram.new(a).weights
   #   # => [3, 0, 4, 0, 0, 3]
   #
   #   This means that the `a` array has 3 values between 0.0 and 2.0
   #   4 values between 4.0 and 6.0 and three values between 10.0 and 12.0
-  def counts_from_edges(edges: )
+  def weights
+    return @weights if @weights
+
     lo = edges.first
     step = edges[1] - edges[0]
 
     max_index = ((array.max  - lo) / step).floor
-    bins = Array.new(max_index + 1, 0)
+    @weights = Array.new(max_index + 1, 0)
 
     array.each do |x|
       index = ((x - lo) / step).floor
-      bins[index] += 1
+      @weights[index] += 1
     end
 
-    return bins
+    return @weights
   end
 
   # Finds the "edges" of a given histogram that will mark the boundries
@@ -60,7 +98,7 @@ class MiniHistogram
   # Example:
   #
   #  a = [1,1,1, 5, 5, 5, 5, 10, 10, 10]
-  #  MiniHistogram.edges(a)
+  #  MiniHistogram.new(a).edges
   #  # => [0.0, 2.0, 4.0, 6.0, 8.0, 10.0, 12.0]
   #
   #  There are multiple ways to find edges, this was taken from
@@ -69,6 +107,8 @@ class MiniHistogram
   #  Another good set of implementations is in numpy
   #  https://github.com/numpy/numpy/blob/d9b1e32cb8ef90d6b4a47853241db2a28146a57d/numpy/lib/histograms.py#L222
   def edges
+    return @edges if @edges
+
     hi = array.max
     lo = array.min
 
@@ -81,7 +121,7 @@ class MiniHistogram
       len = 1.0
     else
       bw = (hi - lo) / nbins
-      lbw = log10(bw)
+      lbw = Math.log10(bw)
       if lbw >= 0
         step = 10 ** lbw.floor * 1.0
         r = bw/step
@@ -132,12 +172,38 @@ class MiniHistogram
         end
       end
 
-      edge = []
+      @edges = []
       len.next.times.each do
-        edge << start/divisor
+        @edges << start/divisor
         start += step
       end
-      return edge
+      return @edges
     end
+  end
+
+  # Given an array of Histograms this function calcualtes
+  # an average edge size along with the minimum and maximum
+  # edge values. It then updates the edge value on all inputs
+  #
+  # The main pourpose of this method is to be able to chart multiple
+  # distributions against a similar axis
+  #
+  # See for more context: https://github.com/schneems/derailed_benchmarks/pull/169
+  def self.set_average_edges!(*array_of_histograms)
+    array_of_histograms.each { |x| raise "Input expected to be a histogram but is #{x.inspect}" unless x.is_a?(MiniHistogram) }
+    steps = array_of_histograms.map(&:bin_size)
+    avg_step_size = steps.sum.to_f / steps.length
+
+    max_edge = array_of_histograms.map(&:edges_max).max
+    min_edge = array_of_histograms.map(&:edges_min).min
+
+    average_edges = [min_edge]
+    while average_edges.last < max_edge
+      average_edges << average_edges.last + avg_step_size
+    end
+
+    array_of_histograms.each {|h| h.set_edges(average_edges) }
+
+    return array_of_histograms
   end
 end
