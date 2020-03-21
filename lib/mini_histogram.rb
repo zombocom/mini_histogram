@@ -1,5 +1,4 @@
 require "mini_histogram/version"
-require 'math'
 
 # A class for building histogram info
 #
