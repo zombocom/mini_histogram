@@ -1,4 +1,4 @@
-# MiniHistogram
+# MiniHistogram [![Build Status](https://travis-ci.org/zombocom/mini_histogram.svg?branch=master)](https://travis-ci.org/zombocom/mini_histogram)
 
 What's a histogram and why should you care? First read [Lies, Damned Lies, and Averages: Perc50, Perc95 explained for Programmers](https://schneems.com/2020/03/17/lies-damned-lies-and-averages-perc50-perc95-explained-for-programmers/). This library lets you build histograms in pure Ruby.
 
