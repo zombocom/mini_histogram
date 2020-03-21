@@ -40,6 +40,8 @@ This means that the `array` here had three items between 0.0 and 2.0, four items
 
 Alternatives to this gem include https://github.com/mrkn/enumerable-statistics/. I needed this gem to be able to calculate a "shared" or "average" edge value as seen in this PR https://github.com/mrkn/enumerable-statistics/pull/23. So that I could add histograms to derailed benchmarks: https://github.com/schneems/derailed_benchmarks/pull/169. This gem provides a `MiniHistogram.set_average_edges!` method to help there. Also this gem does not require a native extension compilation (faster to install, but performance is slower), and this gem does not extend or monkeypatch an core classes.
 
+[MiniHistogram API Docs](https://rubydoc.info/github/zombocom/mini_histogram/master/MiniHistogram)
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.

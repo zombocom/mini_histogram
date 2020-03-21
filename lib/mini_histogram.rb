@@ -192,7 +192,7 @@ class MiniHistogram
   def self.set_average_edges!(*array_of_histograms)
     array_of_histograms.each { |x| raise "Input expected to be a histogram but is #{x.inspect}" unless x.is_a?(MiniHistogram) }
     steps = array_of_histograms.map(&:bin_size)
-    avg_step_size = steps.sum.to_f / steps.length
+    avg_step_size = steps.inject(&:+).to_f / steps.length
 
     max_edge = array_of_histograms.map(&:edges_max).max
     min_edge = array_of_histograms.map(&:edges_min).min
