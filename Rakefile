@@ -19,8 +19,8 @@ task :bench do
 
   array = 1000.times.map { rand }
 
-  edges = MiniHistogram.edges(array)
-  my_weights = MiniHistogram.counts_from_edges(array, edges: edges)
+  histogram = MiniHistogram.new(array)
+  my_weights = histogram.weights
   puts array.histogram.weights == my_weights
   puts array.histogram.weights.inspect
   puts my_weights.inspect
@@ -29,8 +29,7 @@ task :bench do
   Benchmark.ips do |x|
     x.report("enumerable stats") { array.histogram }
     x.report("mini histogram  ") {
-      edges = MiniHistogram.edges(array)
-      MiniHistogram.counts_from_edges(array, edges: edges)
+      MiniHistogram.new(array).weights
     }
     x.compare!
   end
