@@ -36,6 +36,14 @@ class MiniHistogram
     edges.max
   end
 
+  def histogram(*_)
+    self
+  end
+
+  def closed
+    :left
+  end
+
   # Sets the edge value to something new,
   # also clears any previously calculated values
   def set_edges(value)
