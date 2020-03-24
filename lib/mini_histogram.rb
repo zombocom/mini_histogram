@@ -19,13 +19,14 @@ require "mini_histogram/version"
 #
 class MiniHistogram
   class Error < StandardError; end
-  attr_reader :array, :left_p
+  attr_reader :array, :left_p, :max
 
   def initialize(array, left_p: false, edges: nil)
     @array = array
     @left_p = left_p
     @edges = edges
     @weights = nil
+    @max = array.max
   end
 
   def edges_min
@@ -46,8 +47,9 @@ class MiniHistogram
 
   # Sets the edge value to something new,
   # also clears any previously calculated values
-  def set_edges(value)
-    @edges = value
+  def update_values(edges:, max: )
+    @edges = edges
+    @max = max
     @weights = nil # clear memoized value
   end
 
@@ -88,7 +90,7 @@ class MiniHistogram
     lo = edges.first
     step = edges[1] - edges[0]
 
-    max_index = ((array.max  - lo) / step).floor
+    max_index = ((@max  - lo) / step).floor
     @weights = Array.new(max_index + 1, 0)
 
     array.each do |x|
@@ -201,6 +203,8 @@ class MiniHistogram
     steps = array_of_histograms.map(&:bin_size)
     avg_step_size = steps.inject(&:+).to_f / steps.length
 
+    max_value = array_of_histograms.map(&:max).max
+
     max_edge = array_of_histograms.map(&:edges_max).max
     min_edge = array_of_histograms.map(&:edges_min).min
 
@@ -209,7 +213,7 @@ class MiniHistogram
       average_edges << average_edges.last + avg_step_size
     end
 
-    array_of_histograms.each {|h| h.set_edges(average_edges) }
+    array_of_histograms.each {|h| h.update_values(edges: average_edges, max: max_value) }
 
     return array_of_histograms
   end
