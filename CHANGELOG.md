@@ -1,5 +1,9 @@
 ## Master
 
+## 0.1.3
+
+- Handle edge cases (https://github.com/zombocom/mini_histogram/pull/2)
+
 ## 0.1.2
 
 - Add `edge` as alias to `edges`
