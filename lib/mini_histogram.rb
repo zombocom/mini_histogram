@@ -21,12 +21,13 @@ class MiniHistogram
   class Error < StandardError; end
   attr_reader :array, :left_p, :max
 
-  def initialize(array, left_p: false, edges: nil)
+  def initialize(array, left_p: true, edges: nil)
     @array = array
     @left_p = left_p
     @edges = edges
     @weights = nil
-    @max = array.max
+
+    @min, @max = array.minmax
   end
 
   def edges_min
@@ -42,7 +43,7 @@ class MiniHistogram
   end
 
   def closed
-    :left
+    @left_p ? :left : :right
   end
 
   # Sets the edge value to something new,
@@ -54,6 +55,8 @@ class MiniHistogram
   end
 
   def bin_size
+    return 0 if edges.length <= 1
+
     edges[1] - edges[0]
   end
 
@@ -86,6 +89,7 @@ class MiniHistogram
   #   4 values between 4.0 and 6.0 and three values between 10.0 and 12.0
   def weights
     return @weights if @weights
+    return @weights = [] if array.empty?
 
     lo = edges.first
     step = edges[1] - edges[0]
@@ -118,16 +122,18 @@ class MiniHistogram
   def edges
     return @edges if @edges
 
-    hi = array.max
-    lo = array.min
+    return @edges = [0.0] if array.empty?
 
-    nbins = sturges * 1.0
+    lo = @min
+    hi = @max
+
+    nbins = sturges.to_f
 
     if hi == lo
-      start = hi
+      start = lo
       step = 1.0
       divisor = 1.0
-      len = 1.0
+      len = 1
     else
       bw = (hi - lo) / nbins
       lbw = Math.log10(bw)
@@ -163,31 +169,32 @@ class MiniHistogram
         start = (lo * divisor).floor
         len = (hi * divisor - start).ceil
       end
-
-      if left_p
-        while (lo < start/divisor)
-          start -= step
-        end
-
-        while (start + (len - 1)*step)/divisor <= hi
-          len += 1
-        end
-      else
-        while lo <= start/divisor
-          start -= step
-        end
-        while (start + (len - 1)*step)/divisor < hi
-          len += 1
-        end
-      end
-
-      @edges = []
-      len.next.times.each do
-        @edges << start/divisor
-        start += step
-      end
-      return @edges
     end
+
+    if left_p
+      while (lo < start/divisor)
+        start -= step
+      end
+
+      while (start + (len - 1)*step)/divisor <= hi
+        len += 1
+      end
+    else
+      while lo <= start/divisor
+        start -= step
+      end
+      while (start + (len - 1)*step)/divisor < hi
+        len += 1
+      end
+    end
+
+    @edges = []
+    len.times.each do
+      @edges << start/divisor
+      start += step
+    end
+
+    return @edges
   end
   alias :edge :edges
 
