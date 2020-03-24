@@ -189,6 +189,7 @@ class MiniHistogram
       return @edges
     end
   end
+  alias :edge :edges
 
   # Given an array of Histograms this function calcualtes
   # an average edge size along with the minimum and maximum

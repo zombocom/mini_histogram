@@ -24,6 +24,7 @@ class MiniHistogramTest < Minitest::Test
     expected = [0.0, 3.5, 7.0, 10.5, 14.0, 17.5, 21.0, 24.5, 28.0]
     assert_equal expected, a.edges
     assert_equal expected, b.edges
+    assert_equal expected, b.edge
   end
 
   def test_weights
