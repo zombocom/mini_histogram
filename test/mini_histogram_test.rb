@@ -1,5 +1,5 @@
 require "test_helper"
-require "enumerable/statistics"
+# require "enumerable/statistics"
 
 class MiniHistogramTest < Minitest::Test
   def test_that_it_has_a_version_number
@@ -7,25 +7,27 @@ class MiniHistogramTest < Minitest::Test
   end
 
   def test_corner_cases
-    expected = [].histogram
+    expected_edge = [0.0]
+    expected_weights = []
 
     a = MiniHistogram.new []
-    assert_equal expected.edge, a.edges
-    assert_equal expected.weights, a.weights
+    assert_equal expected_edge, a.edges
+    assert_equal expected_weights, a.weights
 
     MiniHistogram.set_average_edges!(a, a)
-    assert_equal expected.edge, a.edges
-    assert_equal expected.weights, a.weights
+    assert_equal expected_edge, a.edges
+    assert_equal expected_weights, a.weights
 
-    expected = [1.1].histogram
+    expected_edge = [1.1, 2.1]
+    expected_weights = [1]
 
     a = MiniHistogram.new [1.1]
-    assert_equal expected.edge, a.edges
-    assert_equal expected.weights, a.weights
+    assert_equal expected_edge, a.edges
+    assert_equal expected_weights, a.weights
 
     MiniHistogram.set_average_edges!(a, a)
-    assert_equal expected.edge, a.edges
-    assert_equal expected.weights, a.weights
+    assert_equal expected_edge, a.edges
+    assert_equal expected_weights, a.weights
   end
 
   def test_averaging_edges_has_the_same_weight_and_edge_length

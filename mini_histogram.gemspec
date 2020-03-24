@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "m"
-  spec.add_development_dependency "enumerable-statistics"
+  # Used for comparison testing, but only supports Ruby 2.4+
+  # spec.add_development_dependency "enumerable-statistics"
   spec.add_development_dependency "benchmark-ips"
 end
