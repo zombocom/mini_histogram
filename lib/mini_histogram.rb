@@ -86,6 +86,7 @@ class MiniHistogram
   #   4 values between 4.0 and 6.0 and three values between 10.0 and 12.0
   def weights
     return @weights if @weights
+    return @weights = [] if array.empty?
 
     lo = edges.first
     step = edges[1] - edges[0]
@@ -118,16 +119,17 @@ class MiniHistogram
   def edges
     return @edges if @edges
 
-    hi = array.max
-    lo = array.min
+    return @edges = [0.0] if array.empty?
 
-    nbins = sturges * 1.0
+    lo, hi = array.minmax
+
+    nbins = sturges.to_f
 
     if hi == lo
-      start = hi
+      start = lo
       step = 1.0
       divisor = 1.0
-      len = 1.0
+      len = 1
     else
       bw = (hi - lo) / nbins
       lbw = Math.log10(bw)
@@ -163,31 +165,32 @@ class MiniHistogram
         start = (lo * divisor).floor
         len = (hi * divisor - start).ceil
       end
-
-      if left_p
-        while (lo < start/divisor)
-          start -= step
-        end
-
-        while (start + (len - 1)*step)/divisor <= hi
-          len += 1
-        end
-      else
-        while lo <= start/divisor
-          start -= step
-        end
-        while (start + (len - 1)*step)/divisor < hi
-          len += 1
-        end
-      end
-
-      @edges = []
-      len.next.times.each do
-        @edges << start/divisor
-        start += step
-      end
-      return @edges
     end
+
+    if left_p
+      while (lo < start/divisor)
+        start -= step
+      end
+
+      while (start + (len - 1)*step)/divisor <= hi
+        len += 1
+      end
+    else
+      while lo <= start/divisor
+        start -= step
+      end
+      while (start + (len - 1)*step)/divisor < hi
+        len += 1
+      end
+    end
+
+    @edges = []
+    len.times.each do
+      @edges << start/divisor
+      start += step
+    end
+
+    return @edges
   end
   alias :edge :edges
 
