@@ -27,4 +27,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "m"
   spec.add_development_dependency "enumerable-statistics"
+  spec.add_development_dependency "benchmark-ips"
 end

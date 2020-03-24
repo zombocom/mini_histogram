@@ -26,7 +26,8 @@ class MiniHistogram
     @left_p = left_p
     @edges = edges
     @weights = nil
-    @max = array.max
+
+    @min, @max = array.minmax
   end
 
   def edges_min
@@ -121,7 +122,8 @@ class MiniHistogram
 
     return @edges = [0.0] if array.empty?
 
-    lo, hi = array.minmax
+    lo = @min
+    hi = @max
 
     nbins = sturges.to_f
 
