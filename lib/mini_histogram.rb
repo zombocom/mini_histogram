@@ -21,7 +21,7 @@ class MiniHistogram
   class Error < StandardError; end
   attr_reader :array, :left_p, :max
 
-  def initialize(array, left_p: false, edges: nil)
+  def initialize(array, left_p: true, edges: nil)
     @array = array
     @left_p = left_p
     @edges = edges
@@ -42,7 +42,7 @@ class MiniHistogram
   end
 
   def closed
-    :left
+    @left_p ? :left : :right
   end
 
   # Sets the edge value to something new,
