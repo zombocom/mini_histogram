@@ -13,9 +13,17 @@ class MiniHistogramTest < Minitest::Test
     assert_equal expected.edge, a.edges
     assert_equal expected.weights, a.weights
 
+    MiniHistogram.set_average_edges!(a, a)
+    assert_equal expected.edge, a.edges
+    assert_equal expected.weights, a.weights
+
     expected = [1.1].histogram
 
     a = MiniHistogram.new [1.1]
+    assert_equal expected.edge, a.edges
+    assert_equal expected.weights, a.weights
+
+    MiniHistogram.set_average_edges!(a, a)
     assert_equal expected.edge, a.edges
     assert_equal expected.weights, a.weights
   end

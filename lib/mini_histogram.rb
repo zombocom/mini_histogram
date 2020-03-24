@@ -55,6 +55,8 @@ class MiniHistogram
   end
 
   def bin_size
+    return 0 if edges.length <= 1
+
     edges[1] - edges[0]
   end
 
