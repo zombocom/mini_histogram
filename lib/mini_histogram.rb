@@ -226,3 +226,5 @@ class MiniHistogram
     return array_of_histograms
   end
 end
+
+require_relative "mini_histogram/plot.rb"
