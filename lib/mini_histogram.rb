@@ -198,6 +198,10 @@ class MiniHistogram
   end
   alias :edge :edges
 
+  def plot
+    raise "You must `require 'mini_histogram/plot'` to get this feature"
+  end
+
   # Given an array of Histograms this function calcualtes
   # an average edge size along with the minimum and maximum
   # edge values. It then updates the edge value on all inputs
@@ -227,4 +231,3 @@ class MiniHistogram
   end
 end
 
-require_relative "mini_histogram/plot.rb"

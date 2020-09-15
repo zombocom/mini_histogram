@@ -43,6 +43,7 @@ This means that the `array` here had three items between 0.0 and 2.0, four items
 You can plot!
 
 ```ruby
+require 'mini_histogram/plot'
 array = 50.times.map { rand(11.2..11.6) }
 histogram = MiniHistogram.new(array)
 puts histogram.plot
@@ -62,6 +63,14 @@ Will generate:
    [11.55, 11.6 ) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇ 4
                   └                                        ┘
                                   Frequency
+```
+
+Integrated plotting is an experimental currently, use with some caution. If you are on Ruby 2.4+ you can pass an instance of MiniHistogram to [unicode_plot.rb](https://github.com/red-data-tools/unicode_plot.rb):
+
+```ruby
+array = 50.times.map { rand(11.2..11.6) }
+histogram = MiniHistogram.new(array)
+puts UnicodePlot.histogram(histogram)
 ```
 
 ## Alternatives

@@ -1,7 +1,16 @@
-
+# Plots the histogram in unicode characters
+#
 # Thanks to https://github.com/red-data-tools/unicode_plot.rb
 # it could not be used because the dependency enumerable-statistics has a hard
-# lock on a specific version of Ruby
+# lock on a specific version of Ruby and this library needs to support older Rubies
+#
+# Example:
+#
+#   require 'mini_histogram/plot'
+#   array = 50.times.map { rand(11.2..11.6) }
+#   histogram = MiniHistogram.new(array)
+#   puts histogram.plot
+#
 class MiniHistogram
   def plot(
     nbins: nil,
@@ -46,7 +55,6 @@ class MiniHistogram
             xlabel: xlabel,
             **kw)
   end
-
 
   private def barplot(
     *args,
@@ -98,7 +106,6 @@ class MiniHistogram
     end
   end
 
-
   private def ceil_neg_log10(x)
     if roundable?(-Math.log10(x))
       (-Math.log10(x)).ceil
@@ -107,11 +114,9 @@ class MiniHistogram
     end
   end
 
-
   private def roundable?(x)
     x.to_i == x && INT64_MIN <= x && x < INT64_MAX
   end
-
 
   module ValueTransformer
     PREDEFINED_TRANSFORM_FUNCTIONS = {
