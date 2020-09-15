@@ -38,6 +38,43 @@ puts histogram.weights
 
 This means that the `array` here had three items between 0.0 and 2.0, four items between 4.0 and 6.0 and three items between 10.0 and 12.0
 
+## Plotting
+
+You can plot!
+
+```ruby
+require 'mini_histogram/plot'
+array = 50.times.map { rand(11.2..11.6) }
+histogram = MiniHistogram.new(array)
+puts histogram.plot
+```
+
+Will generate:
+
+```
+                  ┌                                        ┐
+   [11.2 , 11.25) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 9
+   [11.25, 11.3 ) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 6
+   [11.3 , 11.35) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇ 4
+   [11.35, 11.4 ) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇ 4
+   [11.4 , 11.45) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 11
+   [11.45, 11.5 ) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 5
+   [11.5 , 11.55) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇ 7
+   [11.55, 11.6 ) ┤▇▇▇▇▇▇▇▇▇▇▇▇▇ 4
+                  └                                        ┘
+                                  Frequency
+```
+
+Integrated plotting is an experimental currently, use with some caution. If you are on Ruby 2.4+ you can pass an instance of MiniHistogram to [unicode_plot.rb](https://github.com/red-data-tools/unicode_plot.rb):
+
+```ruby
+array = 50.times.map { rand(11.2..11.6) }
+histogram = MiniHistogram.new(array)
+puts UnicodePlot.histogram(histogram)
+```
+
+## Alternatives
+
 Alternatives to this gem include https://github.com/mrkn/enumerable-statistics/. I needed this gem to be able to calculate a "shared" or "average" edge value as seen in this PR https://github.com/mrkn/enumerable-statistics/pull/23. So that I could add histograms to derailed benchmarks: https://github.com/schneems/derailed_benchmarks/pull/169. This gem provides a `MiniHistogram.set_average_edges!` method to help there. Also this gem does not require a native extension compilation (faster to install, but performance is slower), and this gem does not extend or monkeypatch an core classes.
 
 [MiniHistogram API Docs](https://rubydoc.info/github/zombocom/mini_histogram/master/MiniHistogram)

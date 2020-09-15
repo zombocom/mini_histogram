@@ -1,4 +1,6 @@
-## Master
+## HEAD
+
+- Plotting support added (https://github.com/zombocom/mini_histogram/pull/3)
 
 ## 0.1.3
 
