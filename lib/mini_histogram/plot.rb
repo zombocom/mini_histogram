@@ -283,7 +283,7 @@ class MiniHistogram
     end
 
     def color?(out)
-      out&.tty? || false
+      (out && out.tty?) || false
     end
   end
 
@@ -548,7 +548,7 @@ class MiniHistogram
     end
 
     def ylabel_length
-      ylabel&.length || 0
+      (ylabel && ylabel.length) || 0
     end
 
     def show_labels?
