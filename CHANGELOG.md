@@ -1,5 +1,7 @@
 ## HEAD
 
+## 0.2.1
+
 - Added missing constant needed for plotting support (https://github.com/zombocom/mini_histogram/pull/4)
 
 ## 0.2.0
