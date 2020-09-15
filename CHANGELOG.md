@@ -1,6 +1,8 @@
 ## HEAD
 
-- Plotting support added (https://github.com/zombocom/mini_histogram/pull/3)
+## 0.2.0
+
+- Experimental plotting support added (https://github.com/zombocom/mini_histogram/pull/3)
 
 ## 0.1.3
 
