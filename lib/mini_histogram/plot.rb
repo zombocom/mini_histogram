@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Plots the histogram in unicode characters
 #
 # Thanks to https://github.com/red-data-tools/unicode_plot.rb
