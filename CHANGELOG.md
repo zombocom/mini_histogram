@@ -1,5 +1,7 @@
 ## HEAD
 
+- Generate dualing side-by-side histograms (https://github.com/zombocom/mini_histogram/pull/6)
+
 ## 0.2.2
 
 - Frozen string optimization in histogram/plot.rb (https://github.com/zombocom/mini_histogram/pull/5)
