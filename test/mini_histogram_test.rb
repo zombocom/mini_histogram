@@ -1,10 +1,27 @@
 require "test_helper"
 
+require 'tempfile'
 require "mini_histogram/plot"
 
 class MiniHistogramTest < Minitest::Test
   def test_that_it_has_a_version_number
     refute_nil ::MiniHistogram::VERSION
+  end
+
+  def test_plot_requires
+    file = Tempfile.new("plot.rb")
+    file.write <<-EOM
+STDOUT.sync = true
+$LOAD_PATH.unshift '#{MINI_HISTOGRAM_LIB_DIR}'
+require 'mini_histogram/plot'
+
+puts MiniHistogram.new([1,2,3,4,5]).plot
+EOM
+    file.close
+
+    out = `ruby #{file.path}`
+    assert_match "Frequency", out
+    assert $?.success?
   end
 
   def test_plot
