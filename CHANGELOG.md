@@ -1,5 +1,7 @@
 ## HEAD
 
+## 0.3.1
+
 - Add missing require for stringio (https://github.com/zombocom/mini_histogram/pull/7)
 
 ## 0.3.0
