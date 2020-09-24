@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'stringio'
+require_relative '../mini_histogram' # allows people to require 'mini_histogram/plot' directly
+
 # Plots the histogram in unicode characters
 #
 # Thanks to https://github.com/red-data-tools/unicode_plot.rb
